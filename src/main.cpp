@@ -7,16 +7,11 @@ Conway* conway;
 int main(){
 	conway = new Conway();
 	conway->init();
-	while(true){
-		while(SDL_PollEvent(&conway->currentEvent)){
-			switch(conway->currentEvent.type){
-			case SDL_QUIT:
-				conway->clean();
-				return 0;
-				break;
-			}
+	while(!conway->exit){
+		conway->getInput();
+		if (!conway->exit){
+			conway->render();
 		}
-		conway->render();
 	}
 	return 0;
 }

@@ -1,5 +1,5 @@
-#ifndef MAIN_HPP
-#define MAIN_HPP
+#ifndef MAIN
+#define MAIN
 
 #include <iostream>
 #include <SDL2/SDL.h>
