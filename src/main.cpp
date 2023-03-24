@@ -5,7 +5,7 @@ Conway* conway;
 
 
 int main(){
-	conway = new Conway();
+	conway = new Conway(4);
 	conway->init();
 	while(!conway->exit){
 		conway->getInput();

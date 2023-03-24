@@ -7,12 +7,13 @@
 
 class Conway {
 public:
-	Conway();
+	Conway(int size);
 	bool exit = false;
 	void init();
 	void render();
 	void clean();
 	void getInput();
+	void renderTable();
 	int size; // size*32 width and height amount cells
 private:
 	SDL_Window* window = nullptr;
