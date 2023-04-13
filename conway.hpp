@@ -12,8 +12,10 @@ public:
 	void init();
 	void render();
 	void clean();
+	void update();
 	void getInput();
 	void renderTable();
+	int countLives(int line, int col, int bit);
 	int size; // size*32 width and height amount cells
 private:
 	SDL_Window* window = nullptr;
