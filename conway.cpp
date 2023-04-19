@@ -45,8 +45,8 @@ char getNeighbors(char* cell){
 }
 
 void Conway::randomizeTable(){ 
-    for (int i=1;i<size+1;i++){
-        for (int j=1;j<size+1;j++){
+    for (int i=0;i<size;i++){
+        for (int j=0;j<size;j++){
             if(rand()%2 == 0){
                 (*this->table)[i][j] = 1;
             }
@@ -59,8 +59,8 @@ void Conway::addNeighbors(pos position){
     for (int line=-1;line<2;line++){
         for (int col=-1;col<2;col++){
             if (line==0 && col==0) continue;
-            int wrapX = (*wrapIndex)[line+position.x];
-            int wrapY = (*wrapIndex)[col+position.y];
+            int wrapX = (*wrapIndex)[line+position.x+1];
+            int wrapY = (*wrapIndex)[col+position.y+1];
             addNeighbor(&(*this->table)[wrapX][wrapY]); 
         }
     }
@@ -70,8 +70,8 @@ void Conway::subNeighbors(pos position){
     for (int line=-1;line<2;line++){
         for (int col=-1;col<2;col++){
             if (line==0 && col==0) continue;
-            int wrapX = (*wrapIndex)[line+position.x];
-            int wrapY = (*wrapIndex)[col+position.y];
+            int wrapX = (*wrapIndex)[line+position.x+1];
+            int wrapY = (*wrapIndex)[col+position.y+1];
             removeNeighbor(&(*this->table)[wrapX][wrapY]); 
         }
     }
@@ -82,8 +82,8 @@ char Conway::countNeighbors(pos position){
     for (int line=-1;line<2;line++){
         for (int col=-1;col<2;col++){
             if (!(line==0 && col==0)){
-                int wrapX = (*wrapIndex)[line+position.x];
-                int wrapY = (*wrapIndex)[col+position.y];
+                int wrapX = (*wrapIndex)[line+position.x+1];
+                int wrapY = (*wrapIndex)[col+position.y+1];
                 if (isAlive(&(*this->table)[wrapX][wrapY])) neighbors++;
             }
         }
@@ -109,19 +109,19 @@ Conway::Conway(int size){
     this->lastTable = new std::vector<std::vector<char>>();
     this->wrapIndex = new std::vector<int>(size+2);
     //wrapping look up table
-    (*this->wrapIndex)[0] = size;
+    (*this->wrapIndex)[0] = size-1;
     for (int i=1; i<size+1; i++){
-        (*this->wrapIndex)[i] = i;
+        (*this->wrapIndex)[i] = i-1;
     }
-    (*wrapIndex)[size+1] = 1;
-    //allocate table with padding!!
-    for (int i=0;i<size+2;i++){
-        this->table->push_back(std::vector<char>(size+2));
+    (*wrapIndex)[size+1] = 0;
+    //allocate table
+    for (int i=0;i<size;i++){
+        this->table->push_back(std::vector<char>(size));
     }
     this->randomizeTable();  
     //first time setup neighbors counts
-    for (int i=1;i<size+1;i++){
-        for(int j=1;j<size+1;j++){
+    for (int i=0;i<size;i++){
+        for(int j=0;j<size;j++){
             int neighbors = countNeighbors({i,j});
             setNeighbors(&(*this->table)[i][j], neighbors);
         }
@@ -174,15 +174,15 @@ void Conway::copyTable(){
 void Conway::render(){ 
     SDL_RenderClear(this->renderer);
     SDL_SetRenderDrawColor(this->renderer, 0, 255, 0, 255);
-    for (int i=0;i<this->size+2;i++){
-        for (int j=0;j<this->size+2;j++){
+    for (int i=0;i<this->size;i++){
+        for (int j=0;j<this->size;j++){
             char* cell = &(*this->table)[i][j];
-            if (isAlive(cell)) SDL_RenderDrawPoint(this->renderer, i-1, j-1);
+            if (isAlive(cell)) SDL_RenderDrawPoint(this->renderer, i, j);
             else {
                 char* lastCell = &(*this->lastTable)[i][j];
                 if (isAlive(lastCell)){
                     SDL_SetRenderDrawColor(this->renderer, 0, 0, 255, 255);
-                    SDL_RenderDrawPoint(this->renderer, i-1, j-1);
+                    SDL_RenderDrawPoint(this->renderer, i, j);
                     SDL_SetRenderDrawColor(this->renderer, 0, 255, 0, 255);
                 }
             }
@@ -193,8 +193,8 @@ void Conway::render(){
 }
 
 void Conway::update(){ 
-    for (int i=1;i<this->size+1;i++){
-        for (int j=1;j<this->size+1;j++){
+    for (int i=0;i<this->size;i++){
+        for (int j=0;j<this->size;j++){
             char* lastCell = &(*this->lastTable)[i][j];
             char* cell = &(*this->table)[i][j];
             char neighbors = getNeighbors(lastCell);
