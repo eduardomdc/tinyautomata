@@ -15,7 +15,7 @@ public:
     Conway(int size);
     void initSDL();
     void randomizeTable();
-    void updatePadding();
+    char countNeighbors(pos position);
     void addNeighbors(pos position);
     void subNeighbors(pos position);
     void render();
@@ -31,6 +31,7 @@ private:
     SDL_Event currentEvent;
     std::vector<std::vector<char>>* table;
     std::vector<std::vector<char>>* lastTable;
+    std::vector<int>* wrapIndex;
 };
 
 #endif

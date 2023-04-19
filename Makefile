@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/emc/projects/conway2
+CMAKE_SOURCE_DIR = /home/emc/projects/conway
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/emc/projects/conway2
+CMAKE_BINARY_DIR = /home/emc/projects/conway
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/emc/projects/conway2/CMakeFiles /home/emc/projects/conway2//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/emc/projects/conway/CMakeFiles /home/emc/projects/conway//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/emc/projects/conway2/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/emc/projects/conway/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

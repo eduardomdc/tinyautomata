@@ -59,7 +59,9 @@ void Conway::addNeighbors(pos position){
     for (int line=-1;line<2;line++){
         for (int col=-1;col<2;col++){
             if (line==0 && col==0) continue;
-            addNeighbor(&(*this->table)[line+position.x][col+position.y]); 
+            int wrapX = (*wrapIndex)[line+position.x];
+            int wrapY = (*wrapIndex)[col+position.y];
+            addNeighbor(&(*this->table)[wrapX][wrapY]); 
         }
     }
 }
@@ -68,40 +70,28 @@ void Conway::subNeighbors(pos position){
     for (int line=-1;line<2;line++){
         for (int col=-1;col<2;col++){
             if (line==0 && col==0) continue;
-            removeNeighbor(&(*this->table)[line+position.x][col+position.y]); 
+            int wrapX = (*wrapIndex)[line+position.x];
+            int wrapY = (*wrapIndex)[col+position.y];
+            removeNeighbor(&(*this->table)[wrapX][wrapY]); 
         }
     }
 }
 
-char countNeighbors(std::vector<std::vector<char>>* table, pos cellPos){
+char Conway::countNeighbors(pos position){
     char neighbors = 0;
     for (int line=-1;line<2;line++){
         for (int col=-1;col<2;col++){
             if (!(line==0 && col==0)){
-                if (isAlive(&(*table)[cellPos.x+line][cellPos.y+col])) neighbors++;
+                int wrapX = (*wrapIndex)[line+position.x];
+                int wrapY = (*wrapIndex)[col+position.y];
+                if (isAlive(&(*this->table)[wrapX][wrapY])) neighbors++;
             }
         }
     }
     return neighbors;
 }
 
-void Conway::updatePadding(){
-   for (int j=1;j<size+1;j++){
-        //top line to bottom padding
-        (*this->table)[size+1][j] = (*this->table)[1][j];
-        //bottom line to top padding
-        (*this->table)[0][j] = (*this->table)[size][j];
-        //left collum to right padding
-        (*this->table)[j][size+1] = (*this->table)[j][1];
-        //right collum to left padding
-        (*this->table)[j][0] = (*this->table)[j][size];
-    }
-    //update diagonals
-    (*this->table)[0][0] = (*this->table)[size][size];
-    (*this->table)[size+1][size+1] = (*this->table)[1][1];
-    (*this->table)[0][size+1] = (*this->table)[size][1];
-    (*this->table)[size+1][0] = (*this->table)[1][size];
-}
+
 /* PPPPP
  * PCCCP
  * PCCCP
@@ -109,6 +99,7 @@ void Conway::updatePadding(){
  * PPPPP
  *  012
  *  123
+ *  padding is not nescessary anymore
  * */
 
 Conway::Conway(int size){
@@ -116,30 +107,28 @@ Conway::Conway(int size){
     this->exit = false;
     this->table = new std::vector<std::vector<char>>();
     this->lastTable = new std::vector<std::vector<char>>();
+    this->wrapIndex = new std::vector<int>(size+2);
+    //wrapping look up table
+    (*this->wrapIndex)[0] = size;
+    for (int i=1; i<size+1; i++){
+        (*this->wrapIndex)[i] = i;
+    }
+    (*wrapIndex)[size+1] = 1;
     //allocate table with padding!!
     for (int i=0;i<size+2;i++){
         this->table->push_back(std::vector<char>(size+2));
     }
-    this->randomizeTable();
-    //place a glider to test toroidality
-    (*this->table)[30][30] = 1;
-    (*this->table)[31][31] = 1;
-    (*this->table)[31][32] = 1;
-    (*this->table)[30][32] = 1;
-    (*this->table)[29][32] = 1;
-    //first time padding setup
-    this->updatePadding();
+    this->randomizeTable();  
     //first time setup neighbors counts
     for (int i=1;i<size+1;i++){
         for(int j=1;j<size+1;j++){
-            int neighbors = countNeighbors(this->table, {i,j});
+            int neighbors = countNeighbors({i,j});
             setNeighbors(&(*this->table)[i][j], neighbors);
         }
     }
-    //second time padding setup
-    this->updatePadding();
     //copy table over to lastTable
     this->lastTable->assign(this->table->begin(), this->table->end());
+    std::cout<<"That's life."<<std::endl;
 }
 
 void Conway::initSDL(){
@@ -147,8 +136,8 @@ void Conway::initSDL(){
         this->window = SDL_CreateWindow("conway's game",
                 0,
                 0,
-                this->size+2,
-                this->size+2,
+                this->size,
+                this->size,
                 SDL_WINDOW_BORDERLESS
                 );
         this->renderer = SDL_CreateRenderer(this->window, -1, 0);
@@ -188,17 +177,12 @@ void Conway::render(){
     for (int i=0;i<this->size+2;i++){
         for (int j=0;j<this->size+2;j++){
             char* cell = &(*this->table)[i][j];
-            if (i==0 || j ==0 || i==size+1 || j==size+1){
-                    SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255);
-                    SDL_RenderDrawPoint(this->renderer, i, j);
-                    SDL_SetRenderDrawColor(this->renderer, 0, 255, 0, 255);
-            }
-            if (isAlive(cell)) SDL_RenderDrawPoint(this->renderer, i, j);
+            if (isAlive(cell)) SDL_RenderDrawPoint(this->renderer, i-1, j-1);
             else {
                 char* lastCell = &(*this->lastTable)[i][j];
                 if (isAlive(lastCell)){
                     SDL_SetRenderDrawColor(this->renderer, 0, 0, 255, 255);
-                    SDL_RenderDrawPoint(this->renderer, i, j);
+                    SDL_RenderDrawPoint(this->renderer, i-1, j-1);
                     SDL_SetRenderDrawColor(this->renderer, 0, 255, 0, 255);
                 }
             }
@@ -208,20 +192,7 @@ void Conway::render(){
     SDL_RenderPresent(this->renderer); 
 }
 
-void Conway::update(){
-    //add new neighbors around padding
-    for (int j=1;j<size+1;j++){
-        char neighbors;
-        neighbors = countNeighbors(this->lastTable, {1,j});
-        setNeighbors(&(*this->lastTable)[1][j], neighbors);
-        neighbors = countNeighbors(this->lastTable, {size,j});
-        setNeighbors(&(*this->lastTable)[size][j], neighbors);
-        neighbors = countNeighbors(this->lastTable, {j,1});
-        setNeighbors(&(*this->lastTable)[j][1], neighbors);
-        neighbors = countNeighbors(this->lastTable, {j,size});
-        setNeighbors(&(*this->lastTable)[j][size], neighbors);
-    }
-
+void Conway::update(){ 
     for (int i=1;i<this->size+1;i++){
         for (int j=1;j<this->size+1;j++){
             char* lastCell = &(*this->lastTable)[i][j];
@@ -243,5 +214,4 @@ void Conway::update(){
             } 
         }
     }
-    updatePadding();
 }
