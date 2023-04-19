@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/emc/projects/conway
+CMAKE_SOURCE_DIR = /home/emc/projects/conway2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/emc/projects/conway
+CMAKE_BINARY_DIR = /home/emc/projects/conway2
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/emc/projects/conway/CMakeFiles /home/emc/projects/conway//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/emc/projects/conway2/CMakeFiles /home/emc/projects/conway2//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/emc/projects/conway/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/emc/projects/conway2/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -128,30 +128,6 @@ conway: cmake_check_build_system
 conway/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/conway.dir/build.make CMakeFiles/conway.dir/build
 .PHONY : conway/fast
-
-bitmap.o: bitmap.cpp.o
-.PHONY : bitmap.o
-
-# target to build an object file
-bitmap.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/conway.dir/build.make CMakeFiles/conway.dir/bitmap.cpp.o
-.PHONY : bitmap.cpp.o
-
-bitmap.i: bitmap.cpp.i
-.PHONY : bitmap.i
-
-# target to preprocess a source file
-bitmap.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/conway.dir/build.make CMakeFiles/conway.dir/bitmap.cpp.i
-.PHONY : bitmap.cpp.i
-
-bitmap.s: bitmap.cpp.s
-.PHONY : bitmap.s
-
-# target to generate assembly for a file
-bitmap.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/conway.dir/build.make CMakeFiles/conway.dir/bitmap.cpp.s
-.PHONY : bitmap.cpp.s
 
 conway.o: conway.cpp.o
 .PHONY : conway.o
@@ -210,9 +186,6 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... conway"
-	@echo "... bitmap.o"
-	@echo "... bitmap.i"
-	@echo "... bitmap.s"
 	@echo "... conway.o"
 	@echo "... conway.i"
 	@echo "... conway.s"

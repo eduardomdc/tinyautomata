@@ -2,27 +2,35 @@
 #define CONWAY
 
 #include <SDL2/SDL.h>
-#include <iostream>
+#include <SDL2/SDL_render.h>
 #include <vector>
+
+struct pos {
+    int x;
+    int y;
+} typedef pos;
 
 class Conway {
 public:
-	Conway(int size);
-	bool exit = false;
-	void init();
-	void render();
-	void clean();
-	void update();
-	void getInput();
-	void renderTable();
-	int countLives(int line, int col, int bit);
-	int size; // size*32 width and height amount cells
+    Conway(int size);
+    void initSDL();
+    void randomizeTable();
+    void updatePadding();
+    void addNeighbors(pos position);
+    void subNeighbors(pos position);
+    void render();
+    void update();
+    void copyTable();
+    void closeSDL();
+    void getInput();
+    int size;
+    bool exit;
 private:
-	SDL_Window* window = nullptr;
-	SDL_Renderer* renderer = nullptr;
-	SDL_Event currentEvent;
-	std::vector<std::vector<int>>* currentTable;
-	std::vector<std::vector<int>>* lastTable;
+    SDL_Window* window = nullptr;
+    SDL_Renderer* renderer = nullptr;
+    SDL_Event currentEvent;
+    std::vector<std::vector<char>>* table;
+    std::vector<std::vector<char>>* lastTable;
 };
 
 #endif
