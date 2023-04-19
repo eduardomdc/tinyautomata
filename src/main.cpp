@@ -6,7 +6,7 @@ Conway* conway;
 
 
 int main(){
-	conway = new Conway(256);
+	conway = new Conway(512);
     conway->initSDL();
 	while(!conway->exit){
 		conway->render();
