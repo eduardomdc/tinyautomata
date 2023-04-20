@@ -18,9 +18,9 @@ public:
     char countNeighbors(pos position);
     void addNeighbors(pos position);
     void subNeighbors(pos position);
-    void render();
+    void drawCell(pos position, short color);
+    void fullRender();
     void update();
-    void copyTable();
     void closeSDL();
     void getInput();
     int size;
@@ -28,6 +28,7 @@ public:
 private:
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
+    SDL_Surface* surface = nullptr;
     SDL_Event currentEvent;
     std::vector<std::vector<char>>* table;
     std::vector<std::vector<char>>* lastTable;

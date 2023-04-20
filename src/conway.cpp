@@ -5,7 +5,8 @@
 #include <vector>
 #include <random>
 
-
+#define ALIVE_COLOR 255
+#define DEAD_COLOR 0
 
 /*
  *      mapping of char bits
@@ -91,17 +92,6 @@ char Conway::countNeighbors(pos position){
     return neighbors;
 }
 
-
-/* PPPPP
- * PCCCP
- * PCCCP
- * PCCCP
- * PPPPP
- *  012
- *  123
- *  padding is not nescessary anymore
- * */
-
 Conway::Conway(int size){
     this->size = size;
     this->exit = false;
@@ -132,15 +122,15 @@ Conway::Conway(int size){
 }
 
 void Conway::initSDL(){
-    if (SDL_Init(SDL_INIT_EVERYTHING) == 0){
+    if (SDL_Init(SDL_INIT_VIDEO) == 0){
         this->window = SDL_CreateWindow("conway's game",
-                0,
-                0,
+                SDL_WINDOWPOS_CENTERED,
+                SDL_WINDOWPOS_CENTERED,
                 this->size,
                 this->size,
                 SDL_WINDOW_BORDERLESS
                 );
-        this->renderer = SDL_CreateRenderer(this->window, -1, 0);
+        this->surface = SDL_GetWindowSurface(this->window);
     }
     else return;
     if (this->renderer){
@@ -167,32 +157,27 @@ void Conway::getInput(){
     }
 }
 
-void Conway::copyTable(){
-    this->lastTable->assign(this->table->begin(),this->table->end());
+void Conway::drawCell(pos position, short color){
+    Uint8* pixelptr = (Uint8*)surface->pixels + (position.x * size + position.y)*4 + 2;
+    *(pixelptr) = color;
 }
 
-void Conway::render(){ 
-    SDL_RenderClear(this->renderer);
-    SDL_SetRenderDrawColor(this->renderer, 0, 255, 0, 255);
-    for (int i=0;i<this->size;i++){
-        for (int j=0;j<this->size;j++){
+void Conway::fullRender(){
+    // need to render all cells first so that we 
+    // can render only the ones that change later
+    Uint8* pixelptr = (Uint8*)surface->pixels;
+    for (int i = 0; i < size; i++){
+        for (int j = 0; j < size; j++){
             char* cell = &(*this->table)[i][j];
-            if (isAlive(cell)) SDL_RenderDrawPoint(this->renderer, i, j);
-            else {
-                char* lastCell = &(*this->lastTable)[i][j];
-                if (isAlive(lastCell)){
-                    SDL_SetRenderDrawColor(this->renderer, 0, 0, 255, 255);
-                    SDL_RenderDrawPoint(this->renderer, i, j);
-                    SDL_SetRenderDrawColor(this->renderer, 0, 255, 0, 255);
-                }
-            }
+            *(pixelptr + j*4 + 2) = 255*(isAlive(cell));
         }
+        pixelptr += size*4;
     }
-    SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255);
-    SDL_RenderPresent(this->renderer); 
+    SDL_UpdateWindowSurface(this->window);
 }
 
-void Conway::update(){ 
+void Conway::update(){
+    this->lastTable->assign(this->table->begin(),this->table->end());
     for (int i=0;i<this->size;i++){
         for (int j=0;j<this->size;j++){
             char* lastCell = &(*this->lastTable)[i][j];
@@ -204,14 +189,17 @@ void Conway::update(){
                 }
                 subNeighbors({i,j});
                 kill(cell);
+                drawCell({i,j}, DEAD_COLOR);
                 continue;
             } else {
                 if (neighbors==3){
                     grow(cell);
                     addNeighbors({i,j});
+                    drawCell({i,j}, ALIVE_COLOR);
                     continue;
                 }
             } 
         }
     }
+    SDL_UpdateWindowSurface(this->window);
 }

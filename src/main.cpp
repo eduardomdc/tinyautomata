@@ -6,14 +6,12 @@ Conway* conway;
 
 
 int main(){
-	conway = new Conway(512);
+	conway = new Conway(256);
     conway->initSDL();
+    conway->fullRender();
 	while(!conway->exit){
-		conway->render();
-        conway->copyTable();
         conway->update();
         conway->getInput();
-        //SDL_Delay(20);
 	}
 	return 0;
 }
