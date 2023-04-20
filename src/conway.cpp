@@ -181,6 +181,7 @@ void Conway::update(){
     for (int i=0;i<this->size;i++){
         for (int j=0;j<this->size;j++){
             char* lastCell = &(*this->lastTable)[i][j];
+            if (*lastCell == 0) continue;
             char* cell = &(*this->table)[i][j];
             char neighbors = getNeighbors(lastCell);
             if (isAlive(lastCell)){
